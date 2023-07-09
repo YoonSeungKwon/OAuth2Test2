@@ -2,7 +2,7 @@ package yoon.test.oAuthTest2.vo.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import yoon.test.oAuthTest2.enums.Role;
+import yoon.test.oAuthTest2.enums.Providers;
 
 import java.util.Map;
 
@@ -13,17 +13,17 @@ public class OAuthAttribute {
 
     private String name;
 
-    private String picture;
+    private Providers provider;
 
     private String attributeKey;
 
     private Map<String, Object> attributes;
 
     @Builder
-    OAuthAttribute(String email, String name, String picture, String attributeKey, Map<String, Object> attributes){
+    OAuthAttribute(String email, String name, Providers provider, String attributeKey, Map<String, Object> attributes){
         this.email = email;
         this.name = name;
-        this.picture = picture;
+        this.provider = provider;
         this.attributeKey = attributeKey;
         this.attributes = attributes;
     }

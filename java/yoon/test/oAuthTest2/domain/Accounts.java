@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import yoon.test.oAuthTest2.enums.Providers;
 import yoon.test.oAuthTest2.enums.Role;
 
 @Entity
@@ -22,19 +23,22 @@ public class Accounts {
 
     private String name;
 
-    private String picture;
+    @Enumerated(EnumType.STRING)
+    private Providers provider;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @Builder
-    public Accounts(String email, String name, String picture, Role role){
+    public Accounts(String email, String name, Providers provider, Role role){
         this.email = email;
         this.name = name;
-        this.picture = picture;
-        this.role = Role.USER;
+        this.provider = provider;
+        this.role = role;
     }
 
     public String getRoleKey(){
         return this.role.getKey();
     }
+
 }

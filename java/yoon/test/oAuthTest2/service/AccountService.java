@@ -16,15 +16,14 @@ public class AccountService {
     public Accounts saveOAuth(OAuthAttribute attribute){
 
         Accounts account = accountRepository.findByEmail(attribute.getEmail())
-                .map(entity -> update(entity, attribute.getName(), attribute.getPicture()))
+                .map(entity -> update(entity, attribute.getName()))
                 .orElse(toEntity(attribute));
 
         return accountRepository.save(account);
     }
 
-    public Accounts update(Accounts account, String name, String picture){
+    public Accounts update(Accounts account, String name){
         account.setName(name);
-        account.setPicture(picture);
         return account;
     }
 
@@ -32,7 +31,7 @@ public class AccountService {
         return Accounts.builder()
                 .email(attribute.getEmail())
                 .name(attribute.getName())
-                .picture(attribute.getPicture())
+                .provider(attribute.getProvider())
                 .role(Role.USER)
                 .build();
     }

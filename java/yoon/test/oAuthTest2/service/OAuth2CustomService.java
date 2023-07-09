@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import yoon.test.oAuthTest2.domain.Accounts;
-import yoon.test.oAuthTest2.repository.AccountRepository;
+import yoon.test.oAuthTest2.enums.Providers;
 import yoon.test.oAuthTest2.vo.response.OAuthAttribute;
 
 import java.util.Collections;
@@ -33,8 +33,9 @@ public class OAuth2CustomService implements OAuth2UserService<OAuth2UserRequest,
         String attributeName = userRequest.getClientRegistration().getProviderDetails()
                 .getUserInfoEndpoint().getUserNameAttributeName();
 
-        OAuthAttribute attribute = of(registrationId, attributeName,user.getAttributes());
-
+        OAuthAttribute attribute = of(registrationId, attributeName, user.getAttributes());
+        System.out.println(attribute.getAttributes());
+        System.out.println(attribute);
         Accounts accounts = accountService.saveOAuth(attribute);
 
         return new DefaultOAuth2User(
@@ -43,19 +44,34 @@ public class OAuth2CustomService implements OAuth2UserService<OAuth2UserRequest,
     }
 
     public static OAuthAttribute of(String registrationId, String attributeName, Map<String, Object> attributes){
-        if(registrationId.equals("naver"))
+        if("naver".equals(registrationId))
             return ofNaver(attributeName, attributes);
+        else if ("kakao".equals(registrationId)) {
+            return ofKakao(attributeName, attributes);
+        }
         return ofGoogle(attributeName, attributes);
     }
 
     public static OAuthAttribute ofNaver(String attributeName, Map<String, Object> attributes){
-        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+        Map<String, Object> response = (Map<String, Object>)attributes.get("response");
         return OAuthAttribute.builder()
                 .email(String.valueOf(response.get("email")))
                 .name(String.valueOf(response.get("name")))
-                .picture(String.valueOf(response.get("profile_image")))
+                .provider(Providers.NAVER)
                 .attributeKey(attributeName)
-                .attributes(response)
+                .attributes(attributes)
+                .build();
+    }
+
+    public static OAuthAttribute ofKakao(String attributeName, Map<String, Object> attributes){
+        Map<String, Object> kakaoAcount = (Map<String, Object>)attributes.get("kakao_account");
+        Map<String, Object> kakaoProfile = (Map<String, Object>)kakaoAcount.get("profile");
+        return OAuthAttribute.builder()
+                .email(String.valueOf(kakaoAcount.get("email")))
+                .name(String.valueOf(kakaoProfile.get("nickname")))
+                .provider(Providers.KAKAO)
+                .attributeKey(attributeName)
+                .attributes(attributes)
                 .build();
     }
 
@@ -63,7 +79,7 @@ public class OAuth2CustomService implements OAuth2UserService<OAuth2UserRequest,
         return OAuthAttribute.builder()
                 .email(String.valueOf(attributes.get("email")))
                 .name(String.valueOf(attributes.get("name")))
-                .picture(String.valueOf(attributes.get("picture")))
+                .provider(Providers.GOOGLE)
                 .attributeKey(attributeName)
                 .attributes(attributes)
                 .build();
