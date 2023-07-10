@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import yoon.test.oAuthTest2.config.handler.OAuth2SuccessHandler;
 import yoon.test.oAuthTest2.service.OAuth2CustomService;
 
 @Configuration
@@ -17,7 +18,7 @@ import yoon.test.oAuthTest2.service.OAuth2CustomService;
 public class SecurityConfig {
 
     private final OAuth2CustomService oAuth2CustomService;
-
+    private final OAuth2SuccessHandler successHandler;
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -34,7 +35,10 @@ public class SecurityConfig {
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 //OAuth
-                .oauth2Login(login -> login.userInfoEndpoint(endPoint-> endPoint.userService(oAuth2CustomService)))
+                .oauth2Login(login ->{
+                    login.userInfoEndpoint(endPoint-> endPoint.userService(oAuth2CustomService));
+                    login.successHandler(successHandler);
+                    })
 
                 .build();
     }

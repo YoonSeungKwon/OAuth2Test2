@@ -1,5 +1,6 @@
 package yoon.test.oAuthTest2.service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class OAuth2CustomService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final AccountService accountService;
-
+    private final HttpSession httpSession;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
@@ -37,6 +38,8 @@ public class OAuth2CustomService implements OAuth2UserService<OAuth2UserRequest,
         System.out.println(attribute.getAttributes());
         System.out.println(attribute);
         Accounts accounts = accountService.saveOAuth(attribute);
+
+        httpSession.setAttribute("email", accounts.getEmail());
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority(accounts.getRoleKey())), attribute.getAttributes(),
